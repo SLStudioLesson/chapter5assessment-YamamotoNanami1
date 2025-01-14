@@ -44,7 +44,7 @@ public class TaskLogic {
     // 設問2
     public void showAll(User loginUser) {
         List<Task> tasks = taskDataAccess.findAll();
-        tasks.forEach(task -> {
+        for (Task task : tasks) {
             String name = task.getRepUser().getName();
             if (name.equals(loginUser.getName())){
                 name = "あなた";
@@ -63,7 +63,7 @@ public class TaskLogic {
                     break;
             }
             System.out.println(task.getCode() + ". タスク名：" + task.getName() + ", 担当者名：" + name + "が担当しています, ステータス：" + status);
-        });
+        }
     }
 
     /**
@@ -84,7 +84,7 @@ public class TaskLogic {
         if (user == null) {
             throw new AppException("存在するユーザーコードを入力してください");
         }
-        Task task = new Task(code, name, repUserCode, loginUser);
+        Task task = new Task(code, name, 0, user);
         taskDataAccess.save(task);
         Log log = new Log(code,loginUser.getCode(),0,LocalDate.now());
         logDataAccess.save(log);
@@ -102,9 +102,19 @@ public class TaskLogic {
      * @param loginUser ログインユーザー
      * @throws AppException タスクコードが存在しない、またはステータスが前のステータスより1つ先でない場合にスローされます
      */
-    // public void changeStatus(int code, int status,
-    //                         User loginUser) throws AppException {
-    // }
+    // 設問4
+    public void changeStatus(int code, int status, User loginUser) throws AppException {
+        Task task = taskDataAccess.findByCode(code);
+        if (task == null) {
+            throw new AppException("存在するタスクコードを入力してください");
+        }
+        else if (!((task.getStatus() + 1) == status)) {
+            throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+        }
+        Task updateTask = new Task(code, task.getName(), status, loginUser);
+        taskDataAccess.update(updateTask);
+        System.out.println("ステータスの変更が完了しました。");
+    }
 
     /**
      * タスクを削除します。
