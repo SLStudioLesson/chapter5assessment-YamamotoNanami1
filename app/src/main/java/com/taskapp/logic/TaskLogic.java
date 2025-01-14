@@ -113,6 +113,8 @@ public class TaskLogic {
         }
         Task updateTask = new Task(code, task.getName(), status, loginUser);
         taskDataAccess.update(updateTask);
+        Log log = new Log(code,loginUser.getCode(),status,LocalDate.now());
+        logDataAccess.save(log);
         System.out.println("ステータスの変更が完了しました。");
     }
 
